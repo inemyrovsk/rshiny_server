@@ -1,3 +1,34 @@
+resource "aws_ecr_repository" "rshiny" {
+  name                 = "rshiny-repo"
+  image_tag_mutability = "IMMUTABLE"
+}
+
+resource "aws_ecr_repository_policy" "rshiny-repo-policy" {
+  repository = aws_ecr_repository.rshiny.name
+  policy     = <<EOF
+  {
+    "Version": "2008-10-17",
+    "Statement": [
+      {
+        "Sid": "adds full ecr access to the rshiny repository",
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:BatchGetImage",
+          "ecr:CompleteLayerUpload",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetLifecyclePolicy",
+          "ecr:InitiateLayerUpload",
+          "ecr:PutImage",
+          "ecr:UploadLayerPart"
+        ]
+      }
+    ]
+  }
+  EOF
+}
+
 #resource "aws_secretsmanager_secret" "rstudio_env" {
 #  name        = "rstudio"
 #  description = "Rstudio username and password"
@@ -27,10 +58,11 @@ resource "aws_ecs_task_definition" "rstudio_service" {
   requires_compatibilities = ["EC2"]
   execution_role_arn       = aws_iam_role.ecsTaskExecutionRole.arn
   task_role_arn            = aws_iam_role.ecsTaskExecutionRole.arn
+  network_mode = "bridge"
   container_definitions    = jsonencode([
     {
       name         = "rshiny"
-      image        = "inemyrovsk/shiny-server:${var.docker_image_tag_shiny}"
+      image        = "138941284341.dkr.ecr.eu-central-1.amazonaws.com/rshiny-repo:${var.docker_image_tag}"
       cpu          = 256
       memory       = 512
       essential    = true
@@ -39,6 +71,11 @@ resource "aws_ecs_task_definition" "rstudio_service" {
           containerPort = 3838
           protocol      = "tcp"
           hostPort      = 3838
+        },
+        {
+          containerPort = 8787
+          protocol      = "tcp"
+          hostPort      = 8787
         }
       ]
       environment = [

@@ -12,7 +12,11 @@ resource "aws_launch_configuration" "rshiny_ecs" {
   image_id             = var.ami_for_cluster
   iam_instance_profile = aws_iam_instance_profile.ecs_agent.name
   instance_type        = "t2.micro"
-  user_data            = "#!/bin/bash\necho ECS_CLUSTER=rstudio-cluster >> /etc/ecs/ecs.config"
+  user_data            = <<EOF
+#!/bin/bash -xe
+echo ECS_CLUSTER=rstudio-cluster >> /etc/ecs/ecs.config
+yum install -y nfs-utils
+EOF
   key_name             = "rstudio"
   security_groups      = [aws_security_group.rstudio.id]
 
@@ -21,7 +25,7 @@ resource "aws_launch_configuration" "rshiny_ecs" {
 resource "aws_autoscaling_group" "rshiny_ecs" {
   name                      = "rshiny-ecs-autoscaling-group"
   max_size                  = 2
-  min_size                  = 0
+  min_size                  = 1
   max_instance_lifetime     = 604800
   vpc_zone_identifier       = [aws_subnet.public-1a.id]
   wait_for_capacity_timeout = "10m"

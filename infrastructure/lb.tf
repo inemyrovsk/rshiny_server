@@ -1,8 +1,8 @@
 resource "aws_lb" "rstudio" {
-  name                   = "rstudio-loadBalancer"
-  internal               = false
-  load_balancer_type     = "application"
-  security_groups        = [aws_security_group.rstudio.id]
+  name               = "rstudio-loadBalancer"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.rstudio.id]
   subnets            = [
     aws_subnet.public-1a.id, aws_subnet.public-2b.id
   ]
@@ -15,6 +15,37 @@ resource "aws_lb" "rstudio" {
   }
 
 }
+
+#resource "aws_iam_policy" "ec2-policy" {
+#  name = "ec2-policy"
+#
+#  policy = <<EOT
+#{
+#    "Statement": [
+#        {
+#            "Action": [
+#                "ecs:CreateCluster",
+#                "ecs:DeregisterContainerInstance",
+#                "ecs:DiscoverPollEndpoint",
+#                "ecs:Poll",
+#                "ecs:StartTask",
+#                "ecs:StopTask",
+#                "ecs:RegisterContainerInstance",
+#                "ecs:StartTelemetrySession",
+#                "ecs:Submit*",
+#                "logs:CreateLogStream",
+#                "logs:PutLogEvents",
+#                "ecr:GetAuthorizationToken",
+#                "ecr:BatchGetImage",
+#                "ecr:GetDownloadUrlForLayer"
+#            ],
+#            "Resource": "*",
+#            "Effect": "Allow"
+#        }
+#    ]
+#}
+#EOT
+#}
 
 data "aws_iam_policy_document" "ecs_agent" {
   statement {
@@ -33,9 +64,22 @@ resource "aws_iam_role" "ecs_agent" {
 }
 
 
-resource "aws_iam_role_policy_attachment" "ecs_agent" {
-  role       = "aws_iam_role.ecs_agent.name"
+resource "aws_iam_role_policy_attachment" "ecs_agent_ec2" {
+  role       = aws_iam_role.ecs_agent.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+#resource "aws_iam_role_policy_attachment" "ecs_agent" {
+#  role       = aws_iam_role.ecs_agent.name
+#  policy_arn = aws_iam_policy.ec2-policy.arn
+#}
+resource "aws_iam_role_policy_attachment" "ecs_agent_ssm" {
+  role       = aws_iam_role.ecs_agent.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+}
+resource "aws_iam_role_policy_attachment" "ecs_agent_cloudwatch" {
+  role       = aws_iam_role.ecs_agent.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
 resource "aws_iam_instance_profile" "ecs_agent" {
@@ -46,8 +90,8 @@ resource "aws_iam_instance_profile" "ecs_agent" {
 resource "aws_iam_role" "ecsTaskExecutionRole" {
   name               = "rshiny-execution-task-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
-  tags = {
-    Name        = "rshiny-iam-role"
+  tags               = {
+    Name = "rshiny-iam-role"
   }
 }
 
@@ -69,12 +113,12 @@ resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
 
 
 resource "aws_lb_target_group" "rstudio" {
-  name                          = "rstudio-shiny"
-  port                          = 80
-  protocol                      = "HTTP"
-  vpc_id                        = aws_vpc.main.id
-  deregistration_delay          = 10
-  depends_on = [aws_lb.rstudio]
+  name                 = "rstudio-shiny"
+  port                 = 80
+  protocol             = "HTTP"
+  vpc_id               = aws_vpc.main.id
+  deregistration_delay = 10
+  depends_on           = [aws_lb.rstudio]
 }
 
 resource "aws_lb_listener" "rstudio_http" {
