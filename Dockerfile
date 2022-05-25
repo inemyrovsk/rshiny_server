@@ -1,0 +1,2 @@
+FROM jinseob2kim/docker-rshiny:latest
+RUN R -e "remotes::install_github(c('ohdsi/SqlRender', 'ohdsi/DatabaseConnector', 'ohdsi/OhdsiSharing', 'ohdsi/FeatureExtraction', 'ohdsi/CohortMethod', 'ohdsi/EmpiricalCalibration', 'ohdsi/MethodEvaluation'))"
