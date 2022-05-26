@@ -138,17 +138,3 @@ resource "aws_lb_listener" "rstudio_http" {
     }
   }
 }
-
-resource "aws_lb_listener_rule" "rstudio" {
-  listener_arn = aws_lb_listener.rstudio_http.arn
-
-  action {
-    type             = "forward"
-
-  }
-  condition {
-    path_pattern {
-      values = ["/"]
-    }
-  }
-}
