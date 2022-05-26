@@ -58,7 +58,7 @@ resource "aws_ecs_task_definition" "rstudio_service" {
   requires_compatibilities = ["EC2"]
   execution_role_arn       = aws_iam_role.ecsTaskExecutionRole.arn
   task_role_arn            = aws_iam_role.ecsTaskExecutionRole.arn
-  network_mode = "bridge"
+  network_mode             = "bridge"
   container_definitions    = jsonencode([
     {
       name         = "rshiny"
@@ -102,14 +102,16 @@ resource "aws_ecs_task_definition" "rstudio_service" {
 
 
 resource "aws_ecs_service" "rshiny" {
-  name                              = "rshiny"
-  cluster                           = aws_ecs_cluster.rstudio_cluster.id
-  task_definition                   = aws_ecs_task_definition.rstudio_service.arn
-  launch_type                       = "EC2"
-  desired_count                     = 1
-  enable_ecs_managed_tags           = true
-  health_check_grace_period_seconds = 0
-  propagate_tags                    = "NONE"
+  name                               = "rshiny"
+  cluster                            = aws_ecs_cluster.rstudio_cluster.id
+  task_definition                    = aws_ecs_task_definition.rstudio_service.arn
+  launch_type                        = "EC2"
+  desired_count                      = 1
+  enable_ecs_managed_tags            = true
+  force_new_deployment               = true
+  health_check_grace_period_seconds  = 0
+  deployment_minimum_healthy_percent = 0
+  propagate_tags                     = "NONE"
 
   load_balancer {
     container_name   = "rshiny"
