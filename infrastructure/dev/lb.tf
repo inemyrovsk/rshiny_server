@@ -131,7 +131,7 @@ resource "aws_lb_listener" "rstudio_http" {
 
     redirect {
       port        = "3838"
-      protocol    = "HTTPS"
+      protocol    = "HTTP"
       status_code = "HTTP_301"
     }
   }
