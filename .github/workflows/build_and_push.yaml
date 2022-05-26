@@ -34,7 +34,7 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: rshiny-repo
-        IMAGE_TAG: last
+        IMAGE_TAG: shiny-${{ github.head_ref }}.${{ github.sha }}
       run: |
         docker build -t 138941284341.dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push 138941284341.dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
@@ -48,7 +48,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - run: cd infrastructure && ./tf.sh init
+      - run: pwd && cd infrastructure/ && ./tf.sh init
 
       - id: plan
-        run:  cd infrastructure && ./tf.sh plan
+        run:  cd infrastructure/ && ./tf.sh plan
