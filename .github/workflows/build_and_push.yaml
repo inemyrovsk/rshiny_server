@@ -4,10 +4,27 @@ on:
 
   push:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      start_deployment:
+        type: choice
+        options:
+          - "true"
+          - "false"
+        default: "false"
+        required: false
 env:
   DOCKER_TAG: last
 jobs:
-
+  chose:
+    run: |
+      if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+        if [ "${{ github.event.inputs.start_deployment }}" = "true" ]; then
+          echo "deployment starts"
+        else
+          exit 1
+        fi
+      fi
   build:
 
     name: Build Image
@@ -34,15 +51,14 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: rshiny-repo
-        IMAGE_TAG: shiny-${{ github.head_ref }}.${{ github.sha }}
+        IMAGE_TAG: gh-${GITHUB_RUN_NUMBER}
       run: |
         docker build -t 138941284341.dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push 138941284341.dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
-
   deploy:
     name: Deploy infrastructure
     runs-on: ubuntu-latest
-
+    needs: build
     steps:
       - uses: hashicorp/setup-terraform@v2
         with:
