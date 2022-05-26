@@ -149,3 +149,16 @@ resource "aws_lb_listener_rule" "rstudio" {
     }
   }
 }
+resource "aws_lb_listener_rule" "rshiny" {
+  listener_arn = aws_lb_listener.rstudio_http.arn
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.rstudio.arn
+  }
+  condition {
+    path_pattern {
+      values = ["/shiny"]
+    }
+  }
+}
