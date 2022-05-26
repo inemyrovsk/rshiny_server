@@ -1,16 +1,7 @@
-fluidPage(
-  title = 'MathJax Examples',
-  withMathJax(),
-  helpText('An irrational number \\(\\sqrt{2}\\)
-           and a fraction $$1-\\frac{1}{2}$$'),
-  helpText('and a fact about \\(\\pi\\):
-           $$\\frac2\\pi = \\frac{\\sqrt2}2 \\cdot
-           \\frac{\\sqrt{2+\\sqrt2}}2 \\cdot
-           \\frac{\\sqrt{2+\\sqrt{2+\\sqrt2}}}2 \\cdots$$'),
-  uiOutput('ex1'),
-  uiOutput('ex2'),
-  uiOutput('ex3'),
-  uiOutput('ex4'),
-  checkboxInput('ex5_visible', 'Show Example 5', FALSE),
-  uiOutput('ex5')
+basicPage(
+  plotOutput('plot', width = "300px", height = "300px"),
+  tableOutput('table'),
+  radioButtons('style', 'Progress bar style', c('notification', 'old')),
+  actionButton('goPlot', 'Go plot'),
+  actionButton('goTable', 'Go table')
 )
