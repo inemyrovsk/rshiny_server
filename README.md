@@ -6,7 +6,7 @@
 
 ## To reproduce the environment:
 ### 1. create new environment folder inside infrastructure folder 
-### 2. link all required files to new folder
+### 2. symlink all required files to new folder(ln -s ../dev/tf.sh)
 ### 3. create variable.tf and add environment variable
 ### 4. commit the code
 
