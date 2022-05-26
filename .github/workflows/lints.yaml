@@ -1,0 +1,22 @@
+on: push
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: ./setup-r
+        with:
+          use-public-rspm: true
+
+      - uses: ./setup-r-dependencies
+        with:
+          extra-packages: any::lintr, local::.
+          needs: lint
+
+      - name: Lint
+        run: lintr::lint_package()
+        shell: Rscript {0}

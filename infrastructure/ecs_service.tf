@@ -78,6 +78,24 @@ resource "aws_ecs_task_definition" "rstudio_service" {
           hostPort      = 8787
         }
       ]
+      environment = [
+        {
+          "name" : "USER",
+          "value" : "default"
+        },
+        {
+          "name" : "PASSWORD",
+          "value" : "default"
+        },
+        {
+          "name" : "ROOT",
+          "value" : "TRUE"
+        },
+        {
+          "name" : "PERUSER",
+          "value" : "FALSE"
+        }
+      ]
     }
   ])
 }
