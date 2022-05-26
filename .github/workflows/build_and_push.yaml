@@ -16,15 +16,19 @@ on:
 env:
   DOCKER_TAG: last
 jobs:
-  chose:
-    run: |
-      if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-        if [ "${{ github.event.inputs.start_deployment }}" = "true" ]; then
-          echo "deployment starts"
-        else
-          exit 1
-        fi
-      fi
+
+  start:
+    runs-on: ubuntu-latest
+    steps:
+      - name: start
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ github.event.inputs.start_deployment }}" = "true" ]; then
+              echo "deployment starts"
+            else
+              exit 1
+            fi
+          fi
   build:
 
     name: Build Image
