@@ -130,8 +130,6 @@ resource "aws_lb_listener" "rstudio_http" {
     type = "forward"
 
     forward {
-      port        = "80"
-      protocol    = "HTTP"
       target_group {
         arn = aws_lb_target_group.rstudio.arn
       }
