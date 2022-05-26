@@ -127,38 +127,25 @@ resource "aws_lb_listener" "rstudio_http" {
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
+    type = "forward"
 
-    redirect {
-      port        = "3838"
+    forward {
+      port        = "80"
       protocol    = "HTTP"
-      status_code = "HTTP_301"
-    }
-  }
-}
-
-resource "aws_lb_listener" "rstudio_http_3838" {
-  load_balancer_arn = aws_lb.rstudio.arn
-  port              = 3838
-  protocol          = "HTTP"
-
-  default_action {
-    type = "fixed-response"
-
-    fixed_response {
-      content_type = "text/html"
-      message_body = "ok"
-      status_code  = "200"
+      status_code = "200"
+      target_group {
+        arn = aws_lb_target_group.rstudio.arn
+      }
     }
   }
 }
 
 resource "aws_lb_listener_rule" "rstudio" {
-  listener_arn = aws_lb_listener.rstudio_http_3838.arn
+  listener_arn = aws_lb_listener.rstudio_http.arn
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.rstudio.arn
+
   }
   condition {
     path_pattern {
