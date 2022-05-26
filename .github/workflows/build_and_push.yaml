@@ -48,7 +48,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - run: terraform init
+      - run: cd infrastructure && ./tf.sh init
 
       - id: plan
-        run: terraform plan
+        run:  cd infrastructure && ./tf.sh plan
