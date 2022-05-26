@@ -127,6 +127,22 @@ resource "aws_lb_listener" "rstudio_http" {
   protocol          = "HTTP"
 
   default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "3838"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener" "rstudio_http_3838" {
+  load_balancer_arn = aws_lb.rstudio.arn
+  port              = 3838
+  protocol          = "HTTP"
+
+  default_action {
     type = "fixed-response"
 
     fixed_response {
@@ -136,8 +152,9 @@ resource "aws_lb_listener" "rstudio_http" {
     }
   }
 }
+
 resource "aws_lb_listener_rule" "rstudio" {
-  listener_arn = aws_lb_listener.rstudio_http.arn
+  listener_arn = aws_lb_listener.rstudio_http_3838
 
   action {
     type             = "forward"
@@ -146,19 +163,6 @@ resource "aws_lb_listener_rule" "rstudio" {
   condition {
     path_pattern {
       values = ["/"]
-    }
-  }
-}
-resource "aws_lb_listener_rule" "rshiny" {
-  listener_arn = aws_lb_listener.rstudio_http.arn
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.rstudio.arn
-  }
-  condition {
-    path_pattern {
-      values = ["/shiny"]
     }
   }
 }
